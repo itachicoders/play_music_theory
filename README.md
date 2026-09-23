@@ -124,6 +124,11 @@ Static files are served directly with appropriate MIME types and permissive CORS
 
 ---
 
+## Public demo
+- **Vercel**: https://play-music-theory.vercel.app/
+
+---
+
 ## License
 
 Custom backend implementations, configuration, and interface modifications are distributed under the MIT License. See [LICENSE](LICENSE) for details.
