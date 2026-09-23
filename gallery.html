@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>play_music_theory — gallery</title>
+<meta name="description" content="The gallery of play_music_theory, a visual instrument designed to explore the relationship between sound, shapes and time.">
+<meta property="og:title" content="play_music_theory">
+<meta property="og:description" content="The gallery of play_music_theory, a visual instrument designed to explore the relationship between sound, shapes and time.">
+<meta property="og:image" content="assets/0.jpg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  * { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --paper: #f6f5f0;
+    --paper-tint: #eae7dc;
+    --ink: #141311;
+    --muted: #79766e;
+    --hair: #d9d5c9;
+    --hair-focus: #141311;
+    --raised: #ffffff;
+    --raised-dim: #f5f4ef;
+    --record: #e04f28;
+    --accent: #2b63d9;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --shadow-btn: 0 1px 2px rgba(20, 19, 17, 0.07), 0 2px 4px -1px rgba(20, 19, 17, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+    --shadow-btn-hover: 0 3px 8px -1px rgba(20, 19, 17, 0.12), 0 1px 2px rgba(20, 19, 17, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
+    --shadow-card: 0 2px 6px rgba(20, 19, 17, 0.04), 0 6px 18px -3px rgba(20, 19, 17, 0.08);
+    --shadow-card-hover: 0 4px 12px rgba(20, 19, 17, 0.08), 0 12px 28px -4px rgba(20, 19, 17, 0.12);
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    min-height: 100dvh;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(32px, env(safe-area-inset-bottom));
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle, rgba(20, 19, 17, 0.075) 0.8px, transparent 0.8px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.6) 0.6px, transparent 0.6px);
+    background-size: 14px 14px, 28px 28px;
+    background-position: 0 0, 7px 7px;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 4px 0 10px;
+  }
+
+  .title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: background .12s ease;
+  }
+  .title:hover {
+    background: var(--raised-dim);
+  }
+
+  .backbtn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hair);
+    border-radius: 50%;
+    background: var(--raised);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 16px;
+    box-shadow: var(--shadow-btn);
+    transition: transform .08s ease, box-shadow .08s ease, border-color .08s ease;
+    cursor: pointer;
+  }
+  .backbtn:hover {
+    box-shadow: var(--shadow-btn-hover);
+    border-color: #beb9ab;
+  }
+  .backbtn:active {
+    transform: translateY(-50%) scale(.94);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.15);
+  }
+
+  .piece.pending {
+    border-style: dashed;
+    border-color: #e08928;
+  }
+  .qcount {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .sweepbtn {
+    position: fixed;
+    left: 16px;
+    bottom: 20px;
+    z-index: 5;
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid var(--hair);
+    border-radius: 21px;
+    background: var(--raised);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition: all .12s ease;
+  }
+  .sweepbtn.on {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .piece.marked {
+    outline: 3px solid #1D9E75;
+    outline-offset: -3px;
+  }
+  .piece.marked::after {
+    content: "\2713";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #1D9E75;
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+
+  .grid.picking .adm { display: none; }
+  .grid.picking .piece:not(.pending) { opacity: .35; pointer-events: none; }
+  .commitbar {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    z-index: 5;
+    height: 42px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 22px;
+    background: #D85A30;
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(216, 90, 48, 0.4);
+    transition: transform .08s ease, filter .08s ease;
+  }
+  .commitbar:active { transform: translateX(-50%) scale(.96); }
+  .commitbar[hidden] { display: none; }
+
+  .adm {
+    position: absolute;
+    top: 6px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--raised);
+    border: 1px solid var(--hair);
+    box-shadow: 0 2px 5px rgba(0,0,0,.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    z-index: 4;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+  }
+
+  .piece {
+    display: flex;
+    flex-direction: column;
+    background: var(--raised);
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    transition: transform .12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .12s ease, border-color .12s ease;
+    text-align: left;
+    box-shadow: var(--shadow-card);
+    position: relative;
+  }
+  .piece:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: #beb9ab;
+  }
+  .piece:active {
+    transform: translateY(0) scale(.98);
+    box-shadow: 0 1px 3px rgba(20, 19, 17, 0.08);
+  }
+
+  .piece canvas {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    display: block;
+    background: #ffffff;
+    border-bottom: 1px solid rgba(20, 19, 17, 0.05);
+  }
+
+  .cap {
+    padding: 8px 10px 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 24px;
+    background: var(--raised);
+  }
+  .cap .t {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    font-family: var(--mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+  }
+  .cap .u {
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+    transition: color .1s ease;
+  }
+  .cap a.u:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .badge-local {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--record);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 3;
+    box-shadow: 0 2px 6px var(--record-glow, rgba(224, 79, 40, 0.4));
+  }
+
+  .byline {
+    position: relative;
+    z-index: 1;
+    margin: 36px auto 10px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .byline a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--hair);
+  }
+  .byline a:hover {
+    border-bottom-style: solid;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <a class="backbtn" id="backbtn" href="/play" aria-label="Draw">&#8592;</a>
+    <a class="title" id="titlelink" href="/play">play_music_theory</a>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="byline">a visual instrument to explore sound, shapes &amp; time</div>
+
+<script>
+const COLORS = ['#1D9E75', '#D85A30', '#7F77DD', '#EF9F27', '#3E5EC6', '#DE7BAE', '#85BEE8', '#33312B', '#F4BE82'];
+
+const playUrl = (location.pathname.endsWith('.html') || location.pathname.endsWith('/gallery.html')) ? 'index.html' : '/play';
+const backEl = document.getElementById('backbtn');
+const titleEl = document.getElementById('titlelink');
+if (backEl) backEl.href = playUrl;
+if (titleEl) titleEl.href = playUrl;
+
+const b64uDec = (t) => {
+  const s = atob(t.replace(/-/g, '+').replace(/_/g, '/'));
+  const u = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+  return u;
+};
+
+async function unpack(t) {
+  const kind = t[0];
+  let bytes = b64uDec(t.slice(1));
+  if (kind === 'd') {
+    const ds = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    bytes = new Uint8Array(await new Response(ds).arrayBuffer());
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+function drawPiece(cv, obj) {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = cv.clientWidth * dpr, h = cv.clientHeight * dpr;
+  cv.width = w; cv.height = h;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#fffefb';
+  g.fillRect(0, 0, w, h);
+  const aspect = obj.a ? obj.a / 100 : 4 / 3;
+  let dw = w, dh = w * aspect, dx = 0, dy = (h - dh) / 2;
+  if (dh > h) { dh = h; dw = h / aspect; dx = (w - dw) / 2; dy = 0; }
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+  g.lineWidth = Math.max(1.4, w / 170);
+  for (const arr of (obj.s || []).slice(0, 64)) {
+    g.strokeStyle = COLORS[Math.max(0, Math.min(8, arr[0] | 0))];
+    g.beginPath();
+    for (let i = 1; i + 1 < arr.length; i += 2) {
+      const x = dx + arr[i] / 999 * dw, y = dy + arr[i + 1] / 999 * dh;
+      if (i === 1) g.moveTo(x, y); else g.lineTo(x, y);
+    }
+    g.stroke();
+  }
+}
+
+(async () => {
+  let items = [];
+  const key = (location.hash.match(/^#k=(.+)$/) || [])[1];
+  let queueTotal = 0;
+
+  try {
+    let res;
+    try {
+      res = await fetch('/gallery-data?m=' + Math.floor(Date.now() / 60000) + (key ? '&queue=1&key=' + encodeURIComponent(key) : ''));
+      if (!res.ok) throw new Error('Status ' + res.status);
+    } catch (e1) {
+      res = await fetch('gallery-data.json');
+    }
+    queueTotal = Number(res.headers.get('x-queue-total') || 0);
+    items = await res.json();
+  } catch (e) {
+    console.error('Failed to load gallery items:', e);
+  }
+
+  const grid = document.getElementById('grid');
+
+  if (!key) {
+    try {
+      const mine = localStorage.getItem('pmt.published');
+      if (mine && !items.some((i) => i.p === mine)) {
+        const meta = JSON.parse(localStorage.getItem('pmt.pubmeta') || '{}');
+        items.unshift({ id: '', star: false, pending: false, local: true, p: mine, t: meta.t || '', u: meta.u || '' });
+      }
+    } catch (e) {}
+  }
+
+  let picking = false;
+  const markedIds = new Map();
+  const pendingIds = [];
+  let syncCommit = () => {};
+
+  if (key) {
+    const sw = document.createElement('button');
+    sw.className = 'sweepbtn';
+    sw.textContent = 'pick';
+    document.querySelector('.bar').appendChild(sw);
+
+    const cb = document.createElement('button');
+    cb.className = 'commitbar';
+    cb.hidden = true;
+    document.body.appendChild(cb);
+
+    syncCommit = () => {
+      cb.hidden = !picking || !pendingIds.length;
+      cb.textContent = 'keep ' + markedIds.size + ', clear ' + (pendingIds.length - markedIds.size);
+    };
+
+    sw.onclick = () => {
+      picking = !picking;
+      sw.classList.toggle('on', picking);
+      grid.classList.toggle('picking', picking);
+      if (!picking) {
+        for (const m of markedIds.values()) m.el.classList.remove('marked');
+        markedIds.clear();
+      }
+      syncCommit();
+    };
+
+    cb.onclick = async () => {
+      const keep = [...markedIds.keys()];
+      const drop = pendingIds.filter((id) => !markedIds.has(id));
+      if (!confirm('Keep ' + keep.length + ' and remove ' + drop.length + ' pieces? Removed work is banned from returning.')) return;
+      cb.disabled = true;
+      cb.textContent = 'working';
+      try {
+        const r = await fetch('/gallery-triage?key=' + encodeURIComponent(key), { method: 'POST', body: JSON.stringify({ keep, drop }) });
+        if (r.ok) { location.reload(); return; }
+      } catch (e) {}
+      cb.disabled = false;
+      syncCommit();
+    };
+  }
+
+  let waiting = items.filter((i) => i.pending).length;
+  let qc = null;
+  if (key) {
+    qc = document.createElement('div');
+    qc.className = 'qcount';
+    document.querySelector('.bar').appendChild(qc);
+  }
+
+  const bumpCount = (d) => {
+    waiting += d;
+    if (qc) qc.textContent = (queueTotal > waiting ? waiting + ' of ' + queueTotal : waiting) + ' waiting';
+  };
+  bumpCount(0);
+
+  for (const item of items) {
+    try {
+      const obj = await unpack(item.p);
+      if (!obj || obj.v !== 1 || !Array.isArray(obj.s) || !obj.s.length) continue;
+
+      const btn = document.createElement('button');
+      btn.className = 'piece' + (item.pending ? ' pending' : '');
+
+      if (item.local) {
+        const b = document.createElement('span');
+        b.className = 'badge-local';
+        b.textContent = 'your piece';
+        btn.appendChild(b);
+      }
+
+      if (item.pending && item.id) {
+        pendingIds.push(item.id);
+        syncCommit();
+      }
+
+      const cv = document.createElement('canvas');
+      btn.appendChild(cv);
+
+      if (item.t || item.u || item.n) {
+        const cap = document.createElement('div');
+        cap.className = 'cap';
+
+        if (item.t) {
+          const t = document.createElement('div');
+          t.className = 't';
+          t.textContent = item.t;
+          cap.appendChild(t);
+        }
+
+        if (item.u) {
+          try {
+            const parsed = new URL(item.u);
+            if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+              const a = document.createElement('a');
+              a.className = 'u';
+              a.href = parsed.href;
+              a.target = '_blank';
+              a.rel = 'nofollow noopener ugc';
+              a.textContent = parsed.host + (parsed.pathname !== '/' ? parsed.pathname : '');
+              a.onclick = (e) => e.stopPropagation();
+              cap.appendChild(a);
+            } else {
+              const s = document.createElement('div');
+              s.className = 'u';
+              s.textContent = item.u;
+              cap.appendChild(s);
+            }
+          } catch (e) {
+            const s = document.createElement('div');
+            s.className = 'u';
+            s.textContent = item.u;
+            cap.appendChild(s);
+          }
+        } else if (item.n) {
+          const s = document.createElement('div');
+          s.className = 'u';
+          s.textContent = item.n;
+          cap.appendChild(s);
+        }
+
+        btn.appendChild(cap);
+      }
+
+      btn.onclick = () => {
+        if (picking && item.id && item.pending) {
+          if (markedIds.has(item.id)) {
+            markedIds.delete(item.id);
+            btn.classList.remove('marked');
+          } else {
+            markedIds.set(item.id, { el: btn });
+            btn.classList.add('marked');
+          }
+          syncCommit();
+          return;
+        }
+        location.href = playUrl + '#p=' + item.p;
+      };
+
+      if (key && item.id) {
+        const mk = (label, side) => {
+          const b = document.createElement('span');
+          b.className = 'adm';
+          b.textContent = label;
+          b.style[side] = '6px';
+          btn.appendChild(b);
+          return b;
+        };
+
+        const act = (b, fn, then) => {
+          b.onclick = async (e) => {
+            e.stopPropagation();
+            b.style.opacity = '.25';
+            try {
+              const r = await fetch(fn + '?key=' + encodeURIComponent(key) + '&id=' + encodeURIComponent(item.id));
+              if (!r.ok) throw new Error(String(r.status));
+              b.style.opacity = '1';
+              then(await r.text());
+            } catch (err) {
+              b.style.opacity = '1';
+              b.style.borderColor = '#D85A30';
+            }
+          };
+        };
+
+        const addStar = () => {
+          const st = mk('\u2605', 'left');
+          st.style.opacity = item.star ? '1' : '.45';
+          act(st, '/gallery-feature', (t) => {
+            item.star = t === 'starred';
+            st.style.opacity = item.star ? '1' : '.45';
+            st.style.borderColor = '';
+          });
+        };
+
+        if (item.pending) {
+          const ok = mk('\u2713', 'left');
+          act(ok, '/gallery-approve', () => {
+            item.pending = false;
+            btn.classList.remove('pending');
+            ok.remove();
+            addStar();
+            bumpCount(-1);
+          });
+        } else {
+          addStar();
+        }
+
+        const x = mk('\u00d7', 'right');
+        act(x, '/gallery-remove', () => {
+          if (item.pending) bumpCount(-1);
+          btn.remove();
+        });
+      }
+
+      grid.appendChild(btn);
+      requestAnimationFrame(() => drawPiece(cv, obj));
+    } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>
