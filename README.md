@@ -46,8 +46,8 @@ This self-hosted edition provides a complete, standalone implementation:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/itachicoders/play-music-theory.git
-   cd play-music-theory
+   git clone https://github.com/itachicoders/play_music_theory.git
+   cd play_music_theory
    ```
 
 2. Start the HTTP server:
