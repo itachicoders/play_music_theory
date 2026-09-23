@@ -1,0 +1,17 @@
+# Temporary & runtime files
+*.tmp
+*.log
+*.bak
+*.swp
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# System / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
