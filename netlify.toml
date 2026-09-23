@@ -1,0 +1,28 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/play"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/gallery"
+  to = "/gallery.html"
+  status = 200
+
+[[redirects]]
+  from = "/gallery-data"
+  to = "/gallery-data.json"
+  status = 200
+
+[[redirects]]
+  from = "/publish"
+  to = "/.netlify/functions/publish"
+  status = 200
+
+[[redirects]]
+  from = "/favicon.ico"
+  to = "/icon.svg"
+  status = 200

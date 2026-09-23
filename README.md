@@ -61,6 +61,18 @@ This self-hosted edition provides a complete, standalone implementation:
 
 The listening port can be customized via command-line argument (`python3 server.py <port>`) or the `PORT` environment variable.
 
+### Deploying to Vercel or Netlify
+
+Pre-configured configuration files (`vercel.json` and `netlify.toml`) and serverless functions (`api/publish.js` and `netlify/functions/publish.js`) are included.
+
+1. Push your repository to GitHub.
+2. In the Vercel or Netlify dashboard:
+   - Select **Add New Project** -> Import your GitHub repository.
+   - Leave Build Command empty.
+   - Leave Output Directory empty (or set to `.`).
+   - Click **Deploy**.
+3. All URL rewrites (`/play`, `/gallery`, `/gallery-data`), static assets, and the `/publish` serverless endpoint will be configured automatically.
+
 ---
 
 ## Repository Structure
@@ -69,7 +81,14 @@ The listening port can be customized via command-line argument (`python3 server.
 ├── index.html            # Core synthesizer engine, canvas renderer, and UI
 ├── gallery.html          # Interactive composition browser and viewer
 ├── gallery-data.json     # Local composition database
-├── server.py             # Multi-threaded Python HTTP server
+├── server.py             # Multi-threaded Python HTTP server for local hosting
+├── vercel.json           # Vercel edge routing and rewrites configuration
+├── netlify.toml          # Netlify redirects and headers configuration
+├── api/
+│   └── publish.js        # Vercel serverless function for publishing endpoint
+├── netlify/
+│   └── functions/
+│       └── publish.js    # Netlify serverless function for publishing endpoint
 ├── sw.js                 # Service Worker offline asset cache
 ├── remux.js              # MP4/AAC container remuxer for recording exports
 ├── icon.svg              # Scalable vector application icon
