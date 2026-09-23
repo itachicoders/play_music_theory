@@ -1,7 +1,7 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/play", "destination": "/index.html" },
+    { "source": "/play", "destination": "/" },
     { "source": "/gallery", "destination": "/gallery.html" },
     { "source": "/gallery-data", "destination": "/gallery-data.json" },
     { "source": "/publish", "destination": "/api/publish" },

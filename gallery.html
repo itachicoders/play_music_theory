@@ -323,8 +323,8 @@
 <body>
 <div class="wrap">
   <div class="bar">
-    <a class="backbtn" id="backbtn" href="/play" aria-label="Draw">&#8592;</a>
-    <a class="title" id="titlelink" href="/play">play_music_theory</a>
+    <a class="backbtn" id="backbtn" href="./" aria-label="Draw">&#8592;</a>
+    <a class="title" id="titlelink" href="./">play_music_theory</a>
   </div>
   <div class="grid" id="grid"></div>
 </div>
@@ -333,7 +333,7 @@
 <script>
 const COLORS = ['#1D9E75', '#D85A30', '#7F77DD', '#EF9F27', '#3E5EC6', '#DE7BAE', '#85BEE8', '#33312B', '#F4BE82'];
 
-const playUrl = (location.pathname.endsWith('.html') || location.pathname.endsWith('/gallery.html')) ? 'index.html' : '/play';
+const playUrl = (location.pathname.endsWith('.html') || location.pathname.endsWith('/gallery.html')) ? 'index.html' : './';
 const backEl = document.getElementById('backbtn');
 const titleEl = document.getElementById('titlelink');
 if (backEl) backEl.href = playUrl;
